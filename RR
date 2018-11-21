@@ -1,0 +1,38 @@
+ifile = open("input-rr.txt")
+
+nqueue = []
+rqueue = []
+running_process = {}
+timer = 0
+time_quanta = 1
+
+nqueue = [
+	{'PID': line.split()[0], 'arr_time': int(line.split()[1]), 'burst_time': int(line.split()[2])} for line in ifile.read().splitlines()
+	]
+
+for p in nqueue:
+	print(p)
+
+
+while len(nqueue) > 0 or len(rqueue) > 0:
+	if len(rqueue) > 0:
+		running_process = rqueue[0]
+		rqueue.remove(running_process)
+	else:
+		for new in nqueue:
+			if new['arr_time'] <= timer:
+				rqueue.append(new)
+		for r in rqueue:
+			if r in nqueue:
+				nqueue.remove(r)
+		timer += 1
+
+		continue
+
+	timer += time_quanta
+	running_process['burst_time'] -= time_quanta
+	
+	if running_process['burst_time'] == 0:
+		print("{} exited AT: {}, FT: {}".format(running_process['PID'], running_process['arr_time'], timer - 1))
+	else:
+		rqueue.append(running_process)
